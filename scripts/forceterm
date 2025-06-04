@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR=$(dirname $0)
+CMD="$DIR/forceterm.sh"
+CLASS="de.topobyte.forceterm.RunForceTerm"
+
+exec "$CMD" "$CLASS" "$@"

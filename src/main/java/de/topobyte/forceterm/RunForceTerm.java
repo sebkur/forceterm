@@ -1,9 +1,13 @@
 package de.topobyte.forceterm;
 
+import javax.swing.SwingUtilities;
+
 public class RunForceTerm {
 
     public static void main(String[] args) {
-        System.out.println("forceterm");
+        // Create and show this application's GUI in the event-dispatching thread.
+        ForceTerm tabbedTerminal = new ForceTerm();
+        SwingUtilities.invokeLater(tabbedTerminal::createAndShowGUI);
     }
 
 }

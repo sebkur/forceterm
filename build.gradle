@@ -2,9 +2,8 @@ wrapper {
     gradleVersion = '8.12'
 }
 
-apply plugin: 'java-library'
+apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
 group = pGroup
 version = pVersion
@@ -22,14 +21,25 @@ repositories {
         url = 'https://mvn.slimjars.com'
     }
     mavenCentral()
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+    }
 }
 
 java {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 11
+    targetCompatibility = 11
 }
 
 dependencies {
+    implementation 'org.jetbrains.jediterm:jediterm-ui:3.53'
+    implementation 'org.jetbrains.jediterm:jediterm-core:3.53'
+
+    implementation 'org.jetbrains.pty4j:pty4j:0.12.25'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'org.slf4j:slf4j-jdk14:2.0.9'
+    implementation 'org.jetbrains:annotations:24.0.1'
+    implementation 'com.formdev:flatlaf:3.6'
 }
 
 task copyJars(type: Copy) {
@@ -44,12 +54,4 @@ task copyDeps(type: Copy) {
 
 task createRuntime(dependsOn: [copyJars, copyDeps]) {
     description = 'Setup the execution environment for the main scripts'
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-        }
-    }
 }

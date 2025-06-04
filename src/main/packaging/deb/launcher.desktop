@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ForceTerm
+Comment=Tabbed Terminal app based on jediterm
+Exec=/opt/forceterm/bin/ForceTerm
+Icon=/opt/forceterm/lib/ForceTerm.png
+Terminal=false
+Type=Application
+Categories=System;Utility
+MimeType=

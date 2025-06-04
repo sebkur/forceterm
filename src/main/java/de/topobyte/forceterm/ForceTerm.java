@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 
 import static de.topobyte.forceterm.PlatformUtil.isWindows;
@@ -79,6 +81,11 @@ public class ForceTerm {
     public void createAndShowGUI() {
         frame = new JFrame("ForceTerm");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(
+                Thread.currentThread().getContextClassLoader().getResource("forceterm.png")));
+        System.out.println(icon.getIconWidth());
+        frame.setIconImage(icon.getImage());
 
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

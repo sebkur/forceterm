@@ -1,3 +1,8 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "de.mobanisto.pinpit"
+}
+
 wrapper {
     gradleVersion = '8.12'
 }
@@ -21,6 +26,7 @@ repositories {
         url = 'https://mvn.slimjars.com'
     }
     mavenCentral()
+    google()
     maven {
         url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
     }
@@ -29,17 +35,6 @@ repositories {
 java {
     sourceCompatibility = 11
     targetCompatibility = 11
-}
-
-dependencies {
-    implementation 'org.jetbrains.jediterm:jediterm-ui:3.53'
-    implementation 'org.jetbrains.jediterm:jediterm-core:3.53'
-
-    implementation 'org.jetbrains.pty4j:pty4j:0.12.25'
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'org.slf4j:slf4j-jdk14:2.0.9'
-    implementation 'org.jetbrains:annotations:24.0.1'
-    implementation 'com.formdev:flatlaf:3.6'
 }
 
 task copyJars(type: Copy) {
@@ -54,4 +49,139 @@ task copyDeps(type: Copy) {
 
 task createRuntime(dependsOn: [copyJars, copyDeps]) {
     description = 'Setup the execution environment for the main scripts'
+}
+
+configurations {
+    currentOs {
+        extendsFrom implementation
+    }
+    windowsX64 {
+        extendsFrom implementation
+    }
+    linuxX64 {
+        extendsFrom implementation
+    }
+    linuxArm64 {
+        extendsFrom implementation
+    }
+    macosX64 {
+        extendsFrom implementation
+    }
+    macosArm64 {
+        extendsFrom implementation
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            compileClasspath += configurations.currentOs
+            runtimeClasspath += configurations.currentOs
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains.jediterm:jediterm-ui:3.53'
+    implementation 'org.jetbrains.jediterm:jediterm-core:3.53'
+
+    implementation 'org.jetbrains.pty4j:pty4j:0.12.25'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'org.slf4j:slf4j-jdk14:2.0.9'
+    implementation 'org.jetbrains:annotations:24.0.1'
+    implementation 'com.formdev:flatlaf:3.6'
+}
+
+ext.versionCode = "1.0.0"
+
+pinpit.desktop {
+    application {
+        mainClass = "de.topobyte.forceterm.RunForceTerm"
+        nativeDistributions {
+            jvmVendor = "adoptium"
+            jvmVersion = "17.0.15+6"
+
+            packageVersion = versionCode
+            packageName = "ForceTerm"
+            description = "A tabbed terminal emulator based on jediterm"
+            copyright = "Mobanisto"
+            vendor = "Mobanisto"
+
+            linux {
+                shortcut = true
+                packageName = "forceterm"
+                debMaintainer = "sebastian@mobanisto.de"
+                debPackageVersion = versionCode
+                appCategory = "utils"
+                menuGroup = "System;Utility"
+                iconFile.set(project.file("src/main/packaging/linux/forceterm.png"))
+                debPreInst.set(project.file("src/main/packaging/deb/preinst"))
+                debPostInst.set(project.file("src/main/packaging/deb/postinst"))
+                debPreRm.set(project.file("src/main/packaging/deb/prerm"))
+                debPostRm.set(project.file("src/main/packaging/deb/postrm"))
+                debCopyright.set(project.file("src/main/packaging/deb/copyright"))
+                debLauncher.set(project.file("src/main/packaging/deb/launcher.desktop"))
+                deb("UbuntuFocalX64") {
+                    qualifier = "ubuntu-20.04"
+                    arch = "x64"
+                    depends(
+                            "libc6", "libexpat1", "libgcc-s1", "libpcre3", "libuuid1", "xdg-utils",
+                            "zlib1g", "libnotify4"
+                    )
+                }
+                deb("UbuntuBionicX64") {
+                    qualifier = "ubuntu-18.04"
+                    arch = "x64"
+                    depends(
+                            "libasound2", "libc6", "libexpat1", "libfontconfig1", "libfreetype6",
+                            "libgcc1", "libglib2.0-0", "libgraphite2-3", "libharfbuzz0b",
+                            "libjpeg-turbo8", "liblcms2-2", "libpcre3", "libpng16-16", "libstdc++6",
+                            "xdg-utils", "zlib1g", "libnotify4"
+                    )
+                }
+                deb("DebianBullseyeX64") {
+                    qualifier = "debian-bullseye"
+                    arch = "x64"
+                    depends(
+                            "libasound2", "libbrotli1", "libc6", "libexpat1", "libfontconfig1",
+                            "libfreetype6", "libgcc-s1", "libglib2.0-0", "libgraphite2-3",
+                            "libharfbuzz0b", "libjpeg62-turbo", "liblcms2-2", "libpcre3",
+                            "libpng16-16", "libstdc++6", "libuuid1", "xdg-utils", "zlib1g",
+                            "libnotify4"
+                    )
+                }
+                distributableArchive {
+                    format = "tar.gz"
+                    arch = "arm64"
+                }
+            }
+            windows {
+                dirChooser = true
+                shortcut = true
+                menuGroup = "pinpit"
+                upgradeUuid = "82A808B2-E292-409F-A4E6-DDA59E587E1A"
+                packageVersion = versionCode
+                iconFile.set(project.file("src/main/packaging/windows/forceterm.ico"))
+                msi {
+                    arch = "x64"
+                    bitmapBanner.set(project.file("src/main/packaging/windows/banner.bmp"))
+                    bitmapDialog.set(project.file("src/main/packaging/windows/dialog.bmp"))
+                }
+            }
+            macOS {
+                packageName = "ForceTerm"
+                iconFile.set(project.file("src/main/packaging/macos/forceterm.icns"))
+                bundleID = "de.mobanisto.forceterm"
+                appCategory = "public.app-category.utilities"
+                distributableArchive {
+                    format = "zip"
+                    arch = "x64"
+                }
+                distributableArchive {
+                    format = "zip"
+                    arch = "arm64"
+                }
+            }
+        }
+    }
 }

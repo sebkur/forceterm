@@ -3,52 +3,9 @@ plugins {
     id "de.mobanisto.pinpit"
 }
 
-wrapper {
-    gradleVersion = '8.12'
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-
-group = pGroup
-version = pVersion
-
-if (project.hasProperty("topobyte")) {
-    apply from: 'file:///' + System.getProperty("user.home") \
-        + '/.gradle/topobyte.gradle'
-}
-
 repositories {
-    maven {
-        url = 'https://mvn.topobyte.de'
-    }
-    maven {
-        url = 'https://mvn.slimjars.com'
-    }
     mavenCentral()
     google()
-    maven {
-        url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-    }
-}
-
-java {
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
-
-task copyJars(type: Copy) {
-    into "$buildDir/lib-run"
-    from jar
-}
-
-task copyDeps(type: Copy) {
-    into "$buildDir/lib-run"
-    from configurations.runtimeClasspath
-}
-
-task createRuntime(dependsOn: [copyJars, copyDeps]) {
-    description = 'Setup the execution environment for the main scripts'
 }
 
 configurations {
@@ -76,34 +33,28 @@ sourceSets {
 }
 
 dependencies {
-    implementation 'org.jetbrains.jediterm:jediterm-ui:3.53'
-    implementation 'org.jetbrains.jediterm:jediterm-core:3.53'
-
-    implementation 'org.jetbrains.pty4j:pty4j:0.12.25'
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'org.slf4j:slf4j-jdk14:2.0.9'
-    implementation 'org.jetbrains:annotations:24.0.1'
-    implementation 'com.formdev:flatlaf:3.6'
+    implementation "com.google.guava:guava:19.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
 }
 
 ext.versionCode = "1.0.0"
 
 pinpit.desktop {
     application {
-        mainClass = "de.topobyte.forceterm.RunForceTerm"
+        mainClass = "MainKt"
         nativeDistributions {
             jvmVendor = "adoptium"
             jvmVersion = "17.0.5+8"
 
             packageVersion = versionCode
-            packageName = "ForceTerm"
-            description = "A tabbed terminal emulator based on jediterm"
-            copyright = "Topobyte"
-            vendor = "Topobyte"
+            packageName = "PinpitSwingHelloWorld"
+            description = "Test description"
+            copyright = "Test Copyright Holder"
+            vendor = "Test Vendor"
 
             linux {
                 shortcut = true
-                packageName = "forceterm"
+                packageName = "pinpit-swing-hello-world"
                 debMaintainer = "example@example.com"
                 debPackageVersion = versionCode
                 appCategory = "utils"

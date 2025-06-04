@@ -1,1 +1,13 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+    plugins {
+        def kotlinVersion = getProperty("kotlin.version")
+        def pinpitVersion = getProperty("pinpit.version")
+        id 'org.jetbrains.kotlin.jvm' version kotlinVersion
+        id 'de.mobanisto.pinpit' version pinpitVersion
+    }
+}
 rootProject.name = pName

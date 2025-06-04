@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PinpitSwingHelloWorld
+Comment=Test description
+Exec=/opt/pinpit-swing-hello-world/bin/PinpitSwingHelloWorld
+Icon=/opt/pinpit-swing-hello-world/lib/PinpitSwingHelloWorld.png
+Terminal=false
+Type=Application
+Categories=System;Utility
+MimeType=

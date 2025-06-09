@@ -150,7 +150,7 @@ public class ForceTerm {
             int index = tabbed.indexOfComponent(widget);
             tabbed.setTitleAt(index, title);
         });
-        tabbed.add(widget);
+        tabbed.addTab("Terminal", widget);
         widget.addListener(terminalWidget -> {
             widget.close(); // terminate the current process and dispose all allocated resources
             SwingUtilities.invokeLater(() -> tabbed.remove(widget));

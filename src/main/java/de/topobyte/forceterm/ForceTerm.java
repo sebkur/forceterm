@@ -27,6 +27,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +53,12 @@ public class ForceTerm {
             Map<String, String> envs = System.getenv();
             String[] command;
             if (isWindows()) {
-                command = new String[]{"cmd.exe"};
+                Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
+                if (Files.exists(bash)) {
+                    command = new String[]{bash.toString()};
+                } else {
+                    command = new String[]{"cmd.exe"};
+                }
             } else {
                 command = new String[]{"/bin/bash", "--login"};
                 envs = new HashMap<>(System.getenv());

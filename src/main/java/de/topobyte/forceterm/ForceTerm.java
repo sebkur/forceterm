@@ -66,7 +66,7 @@ public class ForceTerm {
 
     private JFrame frame;
     private JTabbedPane tabbed;
-    private List<JediTermWidget> widgets = new ArrayList<>();
+    private final List<JediTermWidget> widgets = new ArrayList<>();
 
     public void createAndShowGUI() {
         frame = new JFrame("ForceTerm");
@@ -93,7 +93,7 @@ public class ForceTerm {
                 System.exit(0);
             }
             if (selected != null) {
-                SwingUtilities.invokeLater(() -> selected.requestFocusInWindow());
+                SwingUtilities.invokeLater(selected::requestFocusInWindow);
             }
         });
 

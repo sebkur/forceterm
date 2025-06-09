@@ -89,6 +89,9 @@ public class ForceTerm {
 
         tabbed.addChangeListener(e -> {
             Component selected = tabbed.getSelectedComponent();
+            if (tabbed.getTabCount() == 0) {
+                System.exit(0);
+            }
             if (selected != null) {
                 SwingUtilities.invokeLater(() -> selected.requestFocusInWindow());
             }
@@ -150,12 +153,7 @@ public class ForceTerm {
         tabbed.add(widget);
         widget.addListener(terminalWidget -> {
             widget.close(); // terminate the current process and dispose all allocated resources
-            SwingUtilities.invokeLater(() -> {
-                tabbed.remove(widget);
-                if (tabbed.getTabCount() == 0) {
-                    System.exit(0);
-                }
-            });
+            SwingUtilities.invokeLater(() -> tabbed.remove(widget));
         });
 
         widget.getTerminalPanel().addCustomKeyListener(new KeyAdapter() {

@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
+import static de.topobyte.forceterm.PlatformUtil.isMacOS;
 import static de.topobyte.forceterm.PlatformUtil.isWindows;
 
 public class ForceTerm {
@@ -61,6 +62,8 @@ public class ForceTerm {
                 } else {
                     command = new String[]{"cmd.exe"};
                 }
+            } else if (isMacOS()) {
+                command = new String[]{"/bin/zsh", "--login"};
             } else {
                 command = new String[]{"/bin/bash", "--login"};
                 envs = new HashMap<>(System.getenv());

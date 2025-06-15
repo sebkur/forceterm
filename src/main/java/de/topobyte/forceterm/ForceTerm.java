@@ -87,7 +87,6 @@ public class ForceTerm {
 
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(
                 Thread.currentThread().getContextClassLoader().getResource("forceterm.png")));
-        System.out.println(icon.getIconWidth());
         frame.setIconImage(icon.getImage());
 
         try {

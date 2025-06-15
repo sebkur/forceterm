@@ -55,6 +55,7 @@ public class ForceTerm {
         try {
             Map<String, String> envs = System.getenv();
             String[] command;
+            boolean setDirToHome = false;
             if (isWindows()) {
                 Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
                 if (Files.exists(bash)) {
@@ -64,13 +65,24 @@ public class ForceTerm {
                 }
             } else if (isMacOS()) {
                 command = new String[]{"/bin/zsh", "--login"};
+                envs = new HashMap<>(System.getenv());
+                envs.put("TERM", "xterm-256color");
+                envs.put("LANG", "en_US.UTF-8");
+                envs.put("LC_ALL", "en_US.UTF-8");
+
+                setDirToHome = System.getenv().get("TERM") == null;
             } else {
                 command = new String[]{"/bin/bash", "--login"};
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
             }
 
-            PtyProcess process = new PtyProcessBuilder().setCommand(command).setEnvironment(envs).start();
+            PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command).setDirectory("");
+            if (setDirToHome) {
+                ptyProcessBuilder.setDirectory(System.getProperty("user.home"));
+            }
+            ptyProcessBuilder.setEnvironment(envs);
+            PtyProcess process = ptyProcessBuilder.start();
             return new PtyProcessTtyConnector(process, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalStateException(e);

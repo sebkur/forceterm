@@ -213,9 +213,7 @@ public class ForceTerm {
             tabbed.setTitleAt(index, title);
         });
         tabbed.addTab("Terminal", widget);
-        widget.addListener(terminalWidget -> {
-            closeTab(widget);
-        });
+        widget.addListener(terminalWidget -> closeTab(widget));
 
         if (focus) {
             SwingUtilities.invokeLater(() -> {

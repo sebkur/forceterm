@@ -78,6 +78,8 @@ public class ForceTerm {
     private final List<JediTermWidget> widgets = new ArrayList<>();
 
     public void createAndShowGUI() {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
         frame = new JFrame("ForceTerm");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

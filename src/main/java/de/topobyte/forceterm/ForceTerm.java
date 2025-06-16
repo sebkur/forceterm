@@ -7,26 +7,19 @@ import com.jediterm.terminal.ui.JediTermWidget;
 import com.jediterm.terminal.ui.settings.DefaultSettingsProvider;
 import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
+import de.topobyte.swing.util.JMenus;
+import de.topobyte.swing.util.action.SimpleAction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.IntConsumer;
 
 import static de.topobyte.forceterm.PlatformUtil.isMacOS;
@@ -130,53 +123,86 @@ public class ForceTerm {
         });
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
-            if (e.getID() == KeyEvent.KEY_PRESSED) {
-                if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN && e.isControlDown()) {
-                    int i = tabbed.getSelectedIndex();
-                    if (i < tabbed.getTabCount() - 1) {
-                        tabbed.setSelectedIndex(i + 1);
-                    }
-                    return true;
-                } else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP && e.isControlDown()) {
-                    int i = tabbed.getSelectedIndex();
-                    if (i > 0) {
-                        tabbed.setSelectedIndex(i - 1);
-                    }
+            KeyStroke ks = KeyStroke.getKeyStrokeForEvent(e);
+            Object actionKey = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(ks);
+            if (actionKey != null) {
+                Action action = frame.getRootPane().getActionMap().get(actionKey);
+                if (action != null) {
+                    action.actionPerformed(new ActionEvent(frame, ActionEvent.ACTION_PERFORMED, (String) actionKey));
+                    e.consume();
                     return true;
                 }
             }
-
             return false;
         });
 
         frame.pack();
         frame.setVisible(true);
-
-        InputMap inputMap = tabbed.getInputMap();
-        ActionMap actionMap = tabbed.getActionMap();
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK), "ctrl-t");
-        actionMap.put("ctrl-t", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                addTerminalWidget(true);
-            }
-        });
     }
 
     private void createMenu() {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menuFile = new JMenu("File");
-        JMenuItem itemOpenTab = new JMenuItem("Open Tab");
-        JMenuItem itemCloseTab = new JMenuItem("Close Tab");
-        itemOpenTab.addActionListener(e -> addTerminalWidget(true));
-        itemCloseTab.addActionListener(e -> closeCurrentTab());
-        menuFile.add(itemOpenTab);
-        menuFile.add(itemCloseTab);
+
+        Action actionOpenTab = new SimpleAction("Open Tab", "Open a new terminal tab") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                addTerminalWidget(true);
+            }
+
+        };
+
+        Action actionCloseTab = new SimpleAction("Close Tab", "Close currently open terminal tab") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                closeCurrentTab();
+            }
+
+        };
+
+        Action actionPreviousTab = new SimpleAction("Previous tab", "Select the previous tab") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int i = tabbed.getSelectedIndex();
+                if (i > 0) {
+                    tabbed.setSelectedIndex(i - 1);
+                }
+            }
+
+        };
+
+        Action actionNextTab = new SimpleAction("Previous tab", "Select the previous tab") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int i = tabbed.getSelectedIndex();
+                if (i < tabbed.getTabCount() - 1) {
+                    tabbed.setSelectedIndex(i + 1);
+                }
+            }
+
+        };
+
+        define(menuFile, actionOpenTab, KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK), "ctrl-t");
+        define(menuFile, actionCloseTab, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), "ctrl-w");
+        define(menuFile, actionPreviousTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, InputEvent.CTRL_DOWN_MASK), "ctrl-page-up");
+        define(menuFile, actionNextTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, InputEvent.CTRL_DOWN_MASK), "ctrl-page-down");
 
         menuBar.add(menuFile);
-
         frame.setJMenuBar(menuBar);
+    }
+
+    private void define(JMenu menu, Action action, KeyStroke keyStroke, String mapKey) {
+        InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = frame.getRootPane().getActionMap();
+
+        JMenus.addItem(menu, action, keyStroke);
+        inputMap.put(keyStroke, mapKey);
+        actionMap.put(mapKey, action);
     }
 
     private void addTerminalWidget(boolean focus) {
@@ -189,15 +215,6 @@ public class ForceTerm {
         tabbed.addTab("Terminal", widget);
         widget.addListener(terminalWidget -> {
             closeTab(widget);
-        });
-
-        widget.getTerminalPanel().addCustomKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_T && e.isControlDown()) {
-                    addTerminalWidget(true);
-                }
-            }
         });
 
         if (focus) {

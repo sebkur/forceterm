@@ -9,16 +9,7 @@ import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -107,14 +98,14 @@ public class ForceTerm {
             System.out.println("Cannot set look and feel");
         }
 
+        createMenu();
+
         tabbed = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
         frame.setContentPane(tabbed);
 
         tabbed.putClientProperty("JTabbedPane.tabClosable", true);
         tabbed.putClientProperty("JTabbedPane.tabCloseCallback",
-                (IntConsumer) index -> {
-                    tabbed.remove(index);
-                });
+                (IntConsumer) index -> tabbed.remove(index));
 
         tabbed.addChangeListener(e -> {
             Component selected = tabbed.getSelectedComponent();
@@ -172,6 +163,22 @@ public class ForceTerm {
         });
     }
 
+    private void createMenu() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu menuFile = new JMenu("File");
+        JMenuItem itemOpenTab = new JMenuItem("Open Tab");
+        JMenuItem itemCloseTab = new JMenuItem("Close Tab");
+        itemOpenTab.addActionListener(e -> addTerminalWidget(true));
+        itemCloseTab.addActionListener(e -> closeCurrentTab());
+        menuFile.add(itemOpenTab);
+        menuFile.add(itemCloseTab);
+
+        menuBar.add(menuFile);
+
+        frame.setJMenuBar(menuBar);
+    }
+
     private void addTerminalWidget(boolean focus) {
         JediTermWidget widget = createTerminalWidget();
         widgets.add(widget);
@@ -181,8 +188,7 @@ public class ForceTerm {
         });
         tabbed.addTab("Terminal", widget);
         widget.addListener(terminalWidget -> {
-            widget.close(); // terminate the current process and dispose all allocated resources
-            SwingUtilities.invokeLater(() -> tabbed.remove(widget));
+            closeTab(widget);
         });
 
         widget.getTerminalPanel().addCustomKeyListener(new KeyAdapter() {
@@ -200,6 +206,16 @@ public class ForceTerm {
                 widget.getTerminalPanel().requestFocus();
             });
         }
+    }
+
+    private void closeCurrentTab() {
+        JediTermWidget widget = (JediTermWidget) tabbed.getSelectedComponent();
+        closeTab(widget);
+    }
+
+    private void closeTab(JediTermWidget widget) {
+        widget.close(); // terminate the current process and dispose all allocated resources
+        SwingUtilities.invokeLater(() -> tabbed.remove(widget));
     }
 
 }

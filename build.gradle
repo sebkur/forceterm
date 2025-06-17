@@ -155,6 +155,12 @@ pinpit.desktop {
                     format = "tar.gz"
                     arch = "arm64"
                 }
+                appImage {
+                    arch = "x64"
+                }
+                appImage {
+                    arch = "arm64"
+                }
             }
             windows {
                 dirChooser = true

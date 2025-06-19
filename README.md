@@ -2,8 +2,7 @@
 
 The Terminal Strikes Back.
 
-Fully featured terminal based on jediterm.
-
+Fully featured terminal based on [jediterm](https://github.com/JetBrains/jediterm).
 
 ## Usage
 

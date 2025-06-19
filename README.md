@@ -7,5 +7,27 @@ Fully featured terminal based on jediterm.
 
 ## Usage
 
+There are two ways to run the application from source.
+
+Variant 1 (Linux and macOS only):
+
     ./gradlew clean create
     ./scripts/forceterm
+
+Variant 2 (cross-platform):
+
+    ./gradlew pinpitRun
+
+## Hacking
+
+To work on this project you'll probably want to load it into an IDE.
+You should be able to load it into IntelliJ IDEA or Android Studio
+directly.
+
+In order to import the project into an Eclipse workspace, first
+create the Eclipse project and classpath files:
+
+    ./gradlew cleanEclipse eclipse
+
+In any IDE, locate the class `RunForceTerm`, which has the main
+method, and launch it.

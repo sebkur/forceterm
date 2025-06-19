@@ -6,6 +6,14 @@ Fully featured terminal based on [jediterm](https://github.com/JetBrains/jediter
 
 ## Usage
 
+### Download an run a binary
+
+Head over to the [releases](https://github.com/sebkur/forceterm/releases/)
+section. We provide MSI installers for Windows, zipped appliation bundles
+for macOS and AppImage self-contained executables for Linux.
+
+### Run from source
+
 There are two ways to run the application from source.
 
 Variant 1 (Linux and macOS only):

@@ -108,9 +108,6 @@ public class ForceTerm {
 
     public void createAndShowGUI() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        if (SharedPreferences.isUIScalePresent()) {
-            SwingUtils.setUiScale(SharedPreferences.getUIScale());
-        }
 
         theme = ForceTermPreferences.getTheme();
         setLookAndFeel(false);

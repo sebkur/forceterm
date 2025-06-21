@@ -41,7 +41,7 @@ public class ColorPalettes {
             new Color(0x4682b4), //Blue
             new Color(0xff00ff), //Magenta
             new Color(0x00ffff), //Cyan
-            new Color(0x000000), //Black
+            new Color(0x333333), //Dark Gray
     };
 
 }

@@ -7,6 +7,8 @@ import com.jediterm.terminal.TtyConnector;
 import com.jediterm.terminal.ui.JediTermWidget;
 import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
+import de.topobyte.forceterm.preferences.ForceTermPreferences;
+import de.topobyte.forceterm.preferences.Theme;
 import de.topobyte.swing.util.JMenus;
 import de.topobyte.swing.util.action.SimpleAction;
 import org.jetbrains.annotations.NotNull;
@@ -47,10 +49,10 @@ import static de.topobyte.forceterm.PlatformUtil.isWindows;
 
 public class ForceTerm {
 
-    private boolean darkMode = false;
+    private Theme theme;
 
     private Terminal createTerminalWidget() {
-        Terminal terminal = new Terminal(darkMode);
+        Terminal terminal = new Terminal(theme);
         JediTermWidget widget = terminal.getWidget();
 
         widget.getTerminalPanel().setDefaultCursorShape(CursorShape.BLINK_UNDERLINE);
@@ -105,7 +107,8 @@ public class ForceTerm {
     public void createAndShowGUI() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-        setLookAndFeel(darkMode, false);
+        theme = ForceTermPreferences.getTheme();
+        setLookAndFeel(false);
 
         frame = new JFrame("ForceTerm");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -163,21 +166,26 @@ public class ForceTerm {
         frame.setVisible(true);
     }
 
-    private void setLookAndFeel(boolean dark, boolean updateComponentTree) {
+    private void updateTheme() {
+        setLookAndFeel(true);
+        ForceTermPreferences.setTheme(theme);
+    }
+
+    private void setLookAndFeel(boolean updateComponentTree) {
         try {
-            if (dark) {
-                UIManager.setLookAndFeel(new FlatDarculaLaf());
-            } else {
+            if (theme == null || theme == Theme.LIGHT) {
                 UIManager.setLookAndFeel(new FlatLightLaf());
+            } else if (theme == Theme.DARK) {
+                UIManager.setLookAndFeel(new FlatDarculaLaf());
             }
             if (updateComponentTree) {
                 SwingUtilities.updateComponentTreeUI(frame);
             }
         } catch (UnsupportedLookAndFeelException e) {
-            if (dark) {
-                System.err.println("Unable to set dark LAF");
-            } else {
+            if (theme == Theme.LIGHT) {
                 System.err.println("Unable to set light LAF");
+            } else {
+                System.err.println("Unable to set dark LAF");
             }
         }
     }
@@ -234,11 +242,11 @@ public class ForceTerm {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                darkMode = false;
+                theme = Theme.LIGHT;
                 for (Terminal terminal : terminals) {
                     terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS));
                 }
-                setLookAndFeel(false, true);
+                updateTheme();
             }
 
         };
@@ -247,11 +255,11 @@ public class ForceTerm {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                darkMode = true;
+                theme = Theme.DARK;
                 for (Terminal terminal : terminals) {
                     terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS_DARK));
                 }
-                setLookAndFeel(true, true);
+                updateTheme();
             }
 
         };

@@ -9,7 +9,9 @@ import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
 import de.topobyte.forceterm.preferences.ForceTermPreferences;
 import de.topobyte.forceterm.preferences.Theme;
+import de.topobyte.shared.preferences.SharedPreferences;
 import de.topobyte.swing.util.JMenus;
+import de.topobyte.swing.util.SwingUtils;
 import de.topobyte.swing.util.action.SimpleAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -106,6 +108,9 @@ public class ForceTerm {
 
     public void createAndShowGUI() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        if (SharedPreferences.isUIScalePresent()) {
+            SwingUtils.setUiScale(SharedPreferences.getUIScale());
+        }
 
         theme = ForceTermPreferences.getTheme();
         setLookAndFeel(false);

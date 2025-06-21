@@ -91,6 +91,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:24.0.1'
     implementation 'com.formdev:flatlaf:3.6'
     implementation 'de.topobyte:swing-utils:0.0.13'
+    implementation 'de.topobyte:shared-preferences:0.1.0'
 }
 
 ext.versionCode = "1.0.0"

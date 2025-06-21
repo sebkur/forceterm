@@ -1,25 +1,45 @@
 package de.topobyte.forceterm;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.jediterm.terminal.CursorShape;
 import com.jediterm.terminal.TtyConnector;
 import com.jediterm.terminal.ui.JediTermWidget;
-import com.jediterm.terminal.ui.settings.DefaultSettingsProvider;
 import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
 import de.topobyte.swing.util.JMenus;
 import de.topobyte.swing.util.action.SimpleAction;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 
 import static de.topobyte.forceterm.PlatformUtil.isMacOS;
@@ -27,12 +47,17 @@ import static de.topobyte.forceterm.PlatformUtil.isWindows;
 
 public class ForceTerm {
 
-    private static @NotNull JediTermWidget createTerminalWidget() {
-        JediTermWidget widget = new JediTermWidget(80, 24, new DefaultSettingsProvider());
+    private boolean darkMode = false;
+
+    private Terminal createTerminalWidget() {
+        Terminal terminal = new Terminal(darkMode);
+        JediTermWidget widget = terminal.getWidget();
+
         widget.getTerminalPanel().setDefaultCursorShape(CursorShape.BLINK_UNDERLINE);
         widget.setTtyConnector(createTtyConnector());
         widget.start();
-        return widget;
+
+        return terminal;
     }
 
     private static @NotNull TtyConnector createTtyConnector() {
@@ -75,10 +100,12 @@ public class ForceTerm {
 
     private JFrame frame;
     private JTabbedPane tabbed;
-    private final List<JediTermWidget> widgets = new ArrayList<>();
+    private final List<Terminal> terminals = new ArrayList<>();
 
     public void createAndShowGUI() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+        setLookAndFeel(darkMode, false);
 
         frame = new JFrame("ForceTerm");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -86,12 +113,6 @@ public class ForceTerm {
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(
                 Thread.currentThread().getContextClassLoader().getResource("forceterm.png")));
         frame.setIconImage(icon.getImage());
-
-        try {
-            UIManager.setLookAndFeel(new FlatLightLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            System.out.println("Cannot set look and feel");
-        }
 
         createMenu();
 
@@ -118,8 +139,8 @@ public class ForceTerm {
             @Override
             public void windowClosing(WindowEvent e) {
                 frame.setVisible(false);
-                for (JediTermWidget widget : widgets) {
-                    widget.getTtyConnector().close(); // terminate the current process
+                for (Terminal terminal : terminals) {
+                    terminal.getWidget().getTtyConnector().close(); // terminate the current process
                 }
             }
         });
@@ -142,10 +163,30 @@ public class ForceTerm {
         frame.setVisible(true);
     }
 
+    private void setLookAndFeel(boolean dark, boolean updateComponentTree) {
+        try {
+            if (dark) {
+                UIManager.setLookAndFeel(new FlatDarculaLaf());
+            } else {
+                UIManager.setLookAndFeel(new FlatLightLaf());
+            }
+            if (updateComponentTree) {
+                SwingUtilities.updateComponentTreeUI(frame);
+            }
+        } catch (UnsupportedLookAndFeelException e) {
+            if (dark) {
+                System.err.println("Unable to set dark LAF");
+            } else {
+                System.err.println("Unable to set light LAF");
+            }
+        }
+    }
+
     private void createMenu() {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menuFile = new JMenu("File");
+        JMenu menuView = new JMenu("View");
 
         Action actionOpenTab = new SimpleAction("Open Tab", "Open a new terminal tab") {
 
@@ -189,12 +230,42 @@ public class ForceTerm {
 
         };
 
+        Action actionLightMode = new SimpleAction("Light Mode", "Set colors to a light theme") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                darkMode = false;
+                for (Terminal terminal : terminals) {
+                    terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS));
+                }
+                setLookAndFeel(false, true);
+            }
+
+        };
+
+        Action actionDarkMode = new SimpleAction("Dark Mode", "Set colors to a dark theme") {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                darkMode = true;
+                for (Terminal terminal : terminals) {
+                    terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS_DARK));
+                }
+                setLookAndFeel(true, true);
+            }
+
+        };
+
         define(menuFile, actionOpenTab, KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK), "ctrl-t");
         define(menuFile, actionCloseTab, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), "ctrl-w");
         define(menuFile, actionPreviousTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, InputEvent.CTRL_DOWN_MASK), "ctrl-page-up");
         define(menuFile, actionNextTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, InputEvent.CTRL_DOWN_MASK), "ctrl-page-down");
 
+        JMenus.addItem(menuView, actionLightMode);
+        JMenus.addItem(menuView, actionDarkMode);
+
         menuBar.add(menuFile);
+        menuBar.add(menuView);
         frame.setJMenuBar(menuBar);
     }
 
@@ -208,8 +279,10 @@ public class ForceTerm {
     }
 
     private void addTerminalWidget(boolean focus) {
-        JediTermWidget widget = createTerminalWidget();
-        widgets.add(widget);
+        Terminal terminal = createTerminalWidget();
+        terminals.add(terminal);
+
+        JediTermWidget widget = terminal.getWidget();
         widget.getTerminal().addApplicationTitleListener(title -> {
             int index = tabbed.indexOfComponent(widget);
             tabbed.setTitleAt(index, title);

@@ -86,6 +86,9 @@ public class ForceTerm {
                 command = new String[]{"/bin/bash", "--login"};
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
+                // Workaround to make it possible to launch other apps built using jpackage
+                // from the shell.
+                envs.remove("_JPACKAGE_LAUNCHER");
             }
 
             PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command).setDirectory("");

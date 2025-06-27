@@ -166,7 +166,7 @@ pinpit.desktop {
             windows {
                 dirChooser = true
                 shortcut = true
-                menuGroup = "pinpit"
+                menuGroup = "Mobanisto"
                 upgradeUuid = "82A808B2-E292-409F-A4E6-DDA59E587E1A"
                 packageVersion = versionCode
                 iconFile.set(project.file("src/main/packaging/windows/forceterm.ico"))

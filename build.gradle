@@ -94,7 +94,7 @@ dependencies {
     implementation 'de.topobyte:shared-preferences:0.1.0'
 }
 
-ext.versionCode = "1.0.0"
+ext.versionCode = version
 
 pinpit.desktop {
     application {

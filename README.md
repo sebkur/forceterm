@@ -38,3 +38,14 @@ create the Eclipse project and classpath files:
 
 In any IDE, locate the class `RunForceTerm`, which has the main
 method, and launch it.
+
+## Release documentation
+
+Create a tag and push it to origin:
+
+    git tag -a release-<version> -m "Release <version>"
+    git push origin release-<version>
+
+Build release binaries:
+
+    ./release.sh

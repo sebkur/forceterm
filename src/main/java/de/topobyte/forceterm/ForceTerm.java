@@ -74,6 +74,9 @@ public class ForceTerm {
                 } else {
                     command = new String[]{"cmd.exe"};
                 }
+                // We currently don't have a reliable way to determine if this was launched from the start menu
+                // or from any kind of shell (powershell, cmd, git bash etc). So for now, always set the dir to home.
+                setDirToHome = true;
             } else if (isMacOS()) {
                 command = new String[]{"/bin/zsh", "--login"};
                 envs = new HashMap<>(System.getenv());
@@ -91,9 +94,11 @@ public class ForceTerm {
                 envs.remove("_JPACKAGE_LAUNCHER");
             }
 
-            PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command).setDirectory("");
+            PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command);
             if (setDirToHome) {
                 ptyProcessBuilder.setDirectory(System.getProperty("user.home"));
+            } else {
+                ptyProcessBuilder.setDirectory("");
             }
             ptyProcessBuilder.setEnvironment(envs);
             PtyProcess process = ptyProcessBuilder.start();

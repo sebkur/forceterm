@@ -2,12 +2,14 @@ pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
+        maven { url 'https://mvn.topobyte.de' }
     }
     plugins {
         def kotlinVersion = getProperty("kotlin.version")
         def pinpitVersion = getProperty("pinpit.version")
         id 'org.jetbrains.kotlin.jvm' version kotlinVersion
         id 'de.mobanisto.pinpit' version pinpitVersion
+        id 'de.topobyte.version-access-gradle-plugin' version '0.2.0'
     }
 }
 rootProject.name = pName

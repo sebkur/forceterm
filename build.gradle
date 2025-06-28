@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.kotlin.jvm"
     id "de.mobanisto.pinpit"
+    id "de.topobyte.version-access-gradle-plugin"
 }
 
 wrapper {
@@ -12,11 +13,6 @@ apply plugin: 'eclipse'
 
 group = pGroup
 version = pVersion
-
-if (project.hasProperty("topobyte")) {
-    apply from: 'file:///' + System.getProperty("user.home") \
-        + '/.gradle/topobyte.gradle'
-}
 
 repositories {
     maven {
@@ -79,6 +75,10 @@ sourceSets {
             runtimeClasspath += configurations.currentOs
         }
     }
+}
+
+generateVersionAccessSource {
+    packageName = "de.topobyte.forceterm"
 }
 
 dependencies {

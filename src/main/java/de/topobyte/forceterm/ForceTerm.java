@@ -118,7 +118,8 @@ public class ForceTerm {
         theme = ForceTermPreferences.getTheme();
         setLookAndFeel(false);
 
-        frame = new JFrame("ForceTerm");
+        String version = Version.getVersion();
+        frame = new JFrame("ForceTerm " + version);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(

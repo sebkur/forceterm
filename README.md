@@ -9,7 +9,7 @@ Fully featured terminal based on [jediterm](https://github.com/JetBrains/jediter
 
 ## Usage
 
-### Download an run a binary
+### Download and run a binary
 
 Head over to the [releases](https://github.com/sebkur/forceterm/releases/)
 section. We provide MSI installers for Windows, zipped appliation bundles

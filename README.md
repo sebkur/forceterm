@@ -4,6 +4,9 @@ The Terminal Strikes Back.
 
 Fully featured terminal based on [jediterm](https://github.com/JetBrains/jediterm).
 
+![Screenshot showing forceterm in light mode](example-light.png)
+![Screenshot showing forceterm in dark mode](example-dark.png)
+
 ## Usage
 
 ### Download an run a binary

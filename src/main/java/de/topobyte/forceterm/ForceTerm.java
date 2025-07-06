@@ -278,8 +278,11 @@ public class ForceTerm {
         define(menuFile, actionPreviousTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, InputEvent.CTRL_DOWN_MASK), "ctrl-page-up");
         define(menuFile, actionNextTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, InputEvent.CTRL_DOWN_MASK), "ctrl-page-down");
 
-        JMenus.addItem(menuView, actionLightMode);
-        JMenus.addItem(menuView, actionDarkMode);
+        JMenu menuTheme = new JMenu("Theme");
+        menuView.add(menuTheme);
+
+        JMenus.addItem(menuTheme, actionLightMode);
+        JMenus.addItem(menuTheme, actionDarkMode);
 
         JMenu menuCursorStyle = new JMenu("Cursor style");
         menuView.add(menuCursorStyle);

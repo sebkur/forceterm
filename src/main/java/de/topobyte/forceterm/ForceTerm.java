@@ -55,7 +55,7 @@ public class ForceTerm {
         Terminal terminal = new Terminal(theme);
         JediTermWidget widget = terminal.getWidget();
 
-        widget.getTerminalPanel().setDefaultCursorShape(CursorShape.BLINK_UNDERLINE);
+        widget.getTerminalPanel().setDefaultCursorShape(ForceTermPreferences.getCursorShape());
         widget.setTtyConnector(createTtyConnector());
         widget.start();
 
@@ -280,6 +280,26 @@ public class ForceTerm {
 
         JMenus.addItem(menuView, actionLightMode);
         JMenus.addItem(menuView, actionDarkMode);
+
+        JMenu menuCursorStyle = new JMenu("Cursor style");
+        menuView.add(menuCursorStyle);
+
+        for (CursorShape shape : CursorShape.values()) {
+            String name = EnumUtil.toCamelCaseWithSpaces(shape.name());
+            Action action = new SimpleAction(name, "Set cursor shape to " + name) {
+
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    for (Terminal terminal : terminals) {
+                        terminal.getWidget().getTerminalPanel().setCursorShape(shape);
+                    }
+                    ForceTermPreferences.setCursorShape(shape);
+                }
+
+            };
+
+            JMenus.addItem(menuCursorStyle, action);
+        }
 
         menuBar.add(menuFile);
         menuBar.add(menuView);

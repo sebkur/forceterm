@@ -128,7 +128,7 @@ pinpit.desktop {
                     arch = "x64"
                     depends(
                             "libc6", "libexpat1", "libgcc-s1", "libpcre3", "libuuid1", "xdg-utils",
-                            "zlib1g", "libnotify4"
+                            "zlib1g"
                     )
                 }
                 deb("UbuntuBionicX64") {
@@ -138,7 +138,7 @@ pinpit.desktop {
                             "libasound2", "libc6", "libexpat1", "libfontconfig1", "libfreetype6",
                             "libgcc1", "libglib2.0-0", "libgraphite2-3", "libharfbuzz0b",
                             "libjpeg-turbo8", "liblcms2-2", "libpcre3", "libpng16-16", "libstdc++6",
-                            "xdg-utils", "zlib1g", "libnotify4"
+                            "xdg-utils", "zlib1g"
                     )
                 }
                 deb("DebianBullseyeX64") {
@@ -148,8 +148,7 @@ pinpit.desktop {
                             "libasound2", "libbrotli1", "libc6", "libexpat1", "libfontconfig1",
                             "libfreetype6", "libgcc-s1", "libglib2.0-0", "libgraphite2-3",
                             "libharfbuzz0b", "libjpeg62-turbo", "liblcms2-2", "libpcre3",
-                            "libpng16-16", "libstdc++6", "libuuid1", "xdg-utils", "zlib1g",
-                            "libnotify4"
+                            "libpng16-16", "libstdc++6", "libuuid1", "xdg-utils", "zlib1g"
                     )
                 }
                 distributableArchive {

@@ -2,6 +2,7 @@ package de.topobyte.forceterm.preferences;
 
 import com.jediterm.terminal.CursorShape;
 
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class ForceTermPreferences {
@@ -29,6 +30,11 @@ public class ForceTermPreferences {
         } else if (theme == Theme.DARK) {
             node.put(THEME, "dark");
         }
+        try {
+            node.flush(); // try to update for other instances instantly
+        } catch (BackingStoreException e) {
+            // Ignore
+        }
     }
 
     public static CursorShape getCursorShape() {
@@ -47,6 +53,11 @@ public class ForceTermPreferences {
                 .userNodeForPackage(ForceTermPreferences.class);
 
         node.put(CURSOR_SHAPE, shape.name());
+        try {
+            node.flush(); // try to update for other instances instantly
+        } catch (BackingStoreException e) {
+            // Ignore
+        }
     }
 
 }

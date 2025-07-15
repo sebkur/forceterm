@@ -2,6 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
     id "de.mobanisto.pinpit"
     id "de.topobyte.version-access-gradle-plugin"
+    id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
 wrapper {
@@ -190,5 +191,12 @@ pinpit.desktop {
                 }
             }
         }
+    }
+}
+
+graalvmNative {
+    binaries.main {
+        imageName = 'forceterm'
+        mainClass = 'de.topobyte.forceterm.RunForceTerm'
     }
 }

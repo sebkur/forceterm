@@ -87,6 +87,10 @@ public class ForceTerm {
                 setDirToHome = System.getenv().get("TERM") == null;
             } else {
                 command = new String[]{"/bin/bash", "--login"};
+                String userShell = System.getenv().get("SHELL");
+                if (userShell != null && !userShell.isBlank()) {
+                    command = new String[]{userShell};
+                }
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
                 // Workaround to make it possible to launch other apps built using jpackage

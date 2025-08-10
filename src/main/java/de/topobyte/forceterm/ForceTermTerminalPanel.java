@@ -24,13 +24,16 @@ public class ForceTermTerminalPanel extends TerminalPanel {
 
     private static final Logger LOG = LoggerFactory.getLogger(ForceTermTerminalPanel.class);
 
-    public ForceTermTerminalPanel(@NotNull SettingsProvider settingsProvider, @NotNull TerminalTextBuffer terminalTextBuffer, @NotNull StyleState styleState) {
+    public ForceTermTerminalPanel(@NotNull SettingsProvider settingsProvider, @NotNull TerminalTextBuffer terminalTextBuffer,
+            @NotNull StyleState styleState) {
         super(settingsProvider, terminalTextBuffer, styleState);
     }
 
-    // Keep our own copy of myBracketedPasteMode mirrored from TerminalPanel because it is private there
+    // Keep our own copy of myBracketedPasteMode mirrored from TerminalPanel
+    // because it is private there
     private volatile boolean myBracketedPasteMode;
-    // Keep a fixed per-panel singleton copy and paste handler that we provide to the parent class, too.
+    // Keep a fixed per-panel singleton copy and paste handler that we provide
+    // to the parent class, too.
     private DefaultTerminalCopyPasteHandler copyPasteHandler = null;
 
     private @NotNull TerminalCopyPasteHandler createOrGetPasteHandler() {
@@ -54,9 +57,12 @@ public class ForceTermTerminalPanel extends TerminalPanel {
     public List<TerminalAction> getActions() {
         List<TerminalAction> actions = new ArrayList<>(super.getActions());
         if (PlatformUtil.getOS() == OperatingSystem.LINUX) {
-            // Linux as opposed to macOS and Windows does have an additional selection clipboard.
-            // Add an action to paste from this one using Shift-Insert so that we can have copy-paste
-            // behavior that is consistent with experience in other Linux apps.
+            // Linux as opposed to macOS and Windows does have an additional
+            // selection clipboard.
+            // Add an action to paste from this one using Shift-Insert so that
+            // we can have copy-paste behavior that is consistent with
+            // experience
+            // in other Linux apps.
             addShiftInsertPasteAction(actions);
         }
         return actions;
@@ -95,9 +101,9 @@ public class ForceTermTerminalPanel extends TerminalPanel {
             // Sanitize clipboard text to use CR as the line separator.
             // See https://github.com/JetBrains/jediterm/issues/136.
             if (!isWindows()) {
-                // On Windows, Java automatically does this CRLF->LF sanitization, but
-                // other terminals on Unix typically also do this sanitization, so
-                // maybe JediTerm also should.
+                // On Windows, Java automatically does this CRLF->LF
+                // sanitization, but other terminals on Unix typically also do
+                // this sanitization, so maybe JediTerm also should.
                 text = text.replace("\r\n", "\n");
             }
             text = text.replace('\n', '\r');

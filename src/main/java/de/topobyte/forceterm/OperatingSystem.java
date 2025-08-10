@@ -5,4 +5,3 @@ public enum OperatingSystem {
     MACOS,
     LINUX;
 }
-

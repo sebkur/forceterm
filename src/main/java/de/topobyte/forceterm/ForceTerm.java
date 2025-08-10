@@ -68,15 +68,17 @@ public class ForceTerm {
             if (os == OperatingSystem.WINDOWS) {
                 Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
                 if (Files.exists(bash)) {
-                    command = new String[]{bash.toString()};
+                    command = new String[] { bash.toString() };
                 } else {
-                    command = new String[]{"cmd.exe"};
+                    command = new String[] { "cmd.exe" };
                 }
-                // We currently don't have a reliable way to determine if this was launched from the start menu
-                // or from any kind of shell (powershell, cmd, git bash etc). So for now, always set the dir to home.
+                // We currently don't have a reliable way to determine if this
+                // was launched from the start menu or from any kind of shell
+                // (powershell, cmd, git bash etc). So for now, always set the
+                // dir to home.
                 setDirToHome = true;
             } else if (os == OperatingSystem.MACOS) {
-                command = new String[]{"/bin/zsh", "--login"};
+                command = new String[] { "/bin/zsh", "--login" };
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
                 envs.put("LANG", "en_US.UTF-8");
@@ -84,10 +86,11 @@ public class ForceTerm {
 
                 setDirToHome = System.getenv().get("TERM") == null;
             } else if (os == OperatingSystem.LINUX) {
-                command = new String[]{"/bin/bash", "--login"};
+                command = new String[] { "/bin/bash", "--login" };
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
-                // Workaround to make it possible to launch other apps built using jpackage
+                // Workaround to make it possible to launch other apps built
+                // using jpackage
                 // from the shell.
                 envs.remove("_JPACKAGE_LAUNCHER");
             } else {
@@ -122,8 +125,7 @@ public class ForceTerm {
         frame = new JFrame("ForceTerm " + version);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        ImageIcon icon = new ImageIcon(Objects.requireNonNull(
-                Thread.currentThread().getContextClassLoader().getResource("forceterm.png")));
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("forceterm.png")));
         frame.setIconImage(icon.getImage());
 
         createMenu();
@@ -132,8 +134,7 @@ public class ForceTerm {
         frame.setContentPane(tabbed);
 
         tabbed.putClientProperty("JTabbedPane.tabClosable", true);
-        tabbed.putClientProperty("JTabbedPane.tabCloseCallback",
-                (IntConsumer) index -> tabbed.remove(index));
+        tabbed.putClientProperty("JTabbedPane.tabCloseCallback", (IntConsumer) index -> tabbed.remove(index));
 
         tabbed.addChangeListener(e -> {
             Component selected = tabbed.getSelectedComponent();
@@ -152,7 +153,8 @@ public class ForceTerm {
             public void windowClosing(WindowEvent e) {
                 frame.setVisible(false);
                 for (Terminal terminal : terminals) {
-                    terminal.getWidget().getTtyConnector().close(); // terminate the current process
+                    // terminate the current process
+                    terminal.getWidget().getTtyConnector().close();
                 }
             }
         });
@@ -344,7 +346,8 @@ public class ForceTerm {
     }
 
     private void closeTab(JediTermWidget widget) {
-        widget.close(); // terminate the current process and dispose all allocated resources
+        widget.close(); // terminate the current process and dispose all
+                        // allocated resources
         SwingUtilities.invokeLater(() -> tabbed.remove(widget));
     }
 

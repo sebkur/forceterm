@@ -12,7 +12,8 @@ public class RunForceTerm {
             SwingUtils.setUiScale(SharedPreferences.getUIScale());
         }
 
-        // Create and show this application's GUI in the event-dispatching thread.
+        // Create and show this application's GUI in the event-dispatching
+        // thread.
         ForceTerm tabbedTerminal = new ForceTerm();
         SwingUtilities.invokeLater(tabbedTerminal::createAndShowGUI);
     }

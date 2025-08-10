@@ -1,6 +1,5 @@
 package de.topobyte.forceterm;
 
-import com.jediterm.terminal.ui.JediTermWidget;
 import de.topobyte.forceterm.preferences.Theme;
 
 public class Terminal {

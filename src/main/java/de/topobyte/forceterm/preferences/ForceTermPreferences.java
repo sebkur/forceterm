@@ -22,8 +22,7 @@ public class ForceTermPreferences {
     }
 
     public static void setTheme(Theme theme) {
-        Preferences node = Preferences
-                .userNodeForPackage(ForceTermPreferences.class);
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
 
         if (theme == Theme.LIGHT) {
             node.put(THEME, "light");
@@ -49,8 +48,7 @@ public class ForceTermPreferences {
     }
 
     public static void setCursorShape(CursorShape shape) {
-        Preferences node = Preferences
-                .userNodeForPackage(ForceTermPreferences.class);
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
 
         node.put(CURSOR_SHAPE, shape.name());
         try {

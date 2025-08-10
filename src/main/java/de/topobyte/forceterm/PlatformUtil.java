@@ -10,8 +10,8 @@ public class PlatformUtil {
         return System.getProperty("os.name").toLowerCase().startsWith("mac");
     }
 
-    // Determine the OS once so that we don't need multiple string comparisons whenever
-    // we want to branch depending on the current operating system.
+    // Determine the OS once so that we don't need multiple string comparisons
+    // whenever we want to branch depending on the current operating system.
     private static OperatingSystem OS;
 
     static {

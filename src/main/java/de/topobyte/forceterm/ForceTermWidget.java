@@ -20,7 +20,8 @@ public class ForceTermWidget extends JediTermWidget {
     }
 
     @Override
-    protected TerminalPanel createTerminalPanel(@NotNull SettingsProvider settingsProvider, @NotNull StyleState styleState, @NotNull TerminalTextBuffer terminalTextBuffer) {
+    protected TerminalPanel createTerminalPanel(@NotNull SettingsProvider settingsProvider, @NotNull StyleState styleState,
+            @NotNull TerminalTextBuffer terminalTextBuffer) {
         return new ForceTermTerminalPanel(settingsProvider, terminalTextBuffer, styleState);
     }
 

@@ -2,6 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
     id "de.mobanisto.pinpit"
     id "de.topobyte.version-access-gradle-plugin"
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 wrapper {
@@ -31,6 +32,13 @@ repositories {
 java {
     sourceCompatibility = 11
     targetCompatibility = 11
+}
+
+spotless {
+    java {
+        eclipse('4.34').configFile("$project.rootDir/formatter.xml")
+        removeUnusedImports()
+    }
 }
 
 task copyJars(type: Copy) {

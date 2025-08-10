@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.jediterm.core.Color;
 import com.jediterm.terminal.CursorShape;
 import com.jediterm.terminal.TtyConnector;
 import com.jediterm.terminal.ui.JediTermWidget;
@@ -44,6 +45,7 @@ import com.pty4j.PtyProcessBuilder;
 
 import de.topobyte.forceterm.preferences.ForceTermPreferences;
 import de.topobyte.forceterm.preferences.Theme;
+import de.topobyte.forceterm.settings.ConfigurationAction;
 import de.topobyte.swing.util.JMenus;
 import de.topobyte.swing.util.action.SimpleAction;
 
@@ -65,15 +67,25 @@ public class ForceTerm {
     private static @NotNull TtyConnector createTtyConnector() {
         try {
             Map<String, String> envs = System.getenv();
-            String[] command;
+            String[] command = null;
             boolean setDirToHome = false;
             OperatingSystem os = PlatformUtil.getOS();
+
+            if (ForceTermPreferences.isUseCustomShell()) {
+                String customShellCommand = ForceTermPreferences.getCustomShellCommand();
+                if (customShellCommand != null) {
+                    command = customShellCommand.split(" ");
+                }
+            }
+
             if (os == OperatingSystem.WINDOWS) {
-                Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
-                if (Files.exists(bash)) {
-                    command = new String[] { bash.toString() };
-                } else {
-                    command = new String[] { "cmd.exe" };
+                if (command == null) {
+                    Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
+                    if (Files.exists(bash)) {
+                        command = new String[] { bash.toString() };
+                    } else {
+                        command = new String[] { "cmd.exe" };
+                    }
                 }
                 // We currently don't have a reliable way to determine if this
                 // was launched from the start menu or from any kind of shell
@@ -81,7 +93,9 @@ public class ForceTerm {
                 // dir to home.
                 setDirToHome = true;
             } else if (os == OperatingSystem.MACOS) {
-                command = new String[] { "/bin/zsh", "--login" };
+                if (command == null) {
+                    command = new String[] { "/bin/zsh", "--login" };
+                }
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
                 envs.put("LANG", "en_US.UTF-8");
@@ -89,7 +103,9 @@ public class ForceTerm {
 
                 setDirToHome = System.getenv().get("TERM") == null;
             } else if (os == OperatingSystem.LINUX) {
-                command = new String[] { "/bin/bash", "--login" };
+                if (command == null) {
+                    command = new String[] { "/bin/bash", "--login" };
+                }
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
                 // Workaround to make it possible to launch other apps built
@@ -180,11 +196,6 @@ public class ForceTerm {
         frame.setVisible(true);
     }
 
-    private void updateTheme() {
-        setLookAndFeel(true);
-        ForceTermPreferences.setTheme(theme);
-    }
-
     private void setLookAndFeel(boolean updateComponentTree) {
         try {
             if (theme == null || theme == Theme.LIGHT) {
@@ -252,15 +263,14 @@ public class ForceTerm {
 
         };
 
+        ConfigurationAction actionSettings = new ConfigurationAction(this);
+
         Action actionLightMode = new SimpleAction("Light Mode", "Set colors to a light theme") {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                theme = Theme.LIGHT;
-                for (Terminal terminal : terminals) {
-                    terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS));
-                }
-                updateTheme();
+                setTheme(Theme.LIGHT);
+                ForceTermPreferences.setTheme(theme);
             }
 
         };
@@ -269,11 +279,8 @@ public class ForceTerm {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                theme = Theme.DARK;
-                for (Terminal terminal : terminals) {
-                    terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(ColorPalettes.XTERM_COLORS_DARK));
-                }
-                updateTheme();
+                setTheme(Theme.DARK);
+                ForceTermPreferences.setTheme(theme);
             }
 
         };
@@ -282,6 +289,7 @@ public class ForceTerm {
         define(menuFile, actionCloseTab, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), "ctrl-w");
         define(menuFile, actionPreviousTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, InputEvent.CTRL_DOWN_MASK), "ctrl-page-up");
         define(menuFile, actionNextTab, KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, InputEvent.CTRL_DOWN_MASK), "ctrl-page-down");
+        JMenus.addItem(menuFile, actionSettings);
 
         JMenu menuTheme = new JMenu("Theme");
         menuView.add(menuTheme);
@@ -298,9 +306,7 @@ public class ForceTerm {
 
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    for (Terminal terminal : terminals) {
-                        terminal.getWidget().getTerminalPanel().setCursorShape(shape);
-                    }
+                    setCursorShape(shape);
                     ForceTermPreferences.setCursorShape(shape);
                 }
 
@@ -352,6 +358,32 @@ public class ForceTerm {
         widget.close(); // terminate the current process and dispose all
                         // allocated resources
         SwingUtilities.invokeLater(() -> tabbed.remove(widget));
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public void setTheme(Theme theme) {
+        this.theme = theme;
+        if (theme == Theme.LIGHT) {
+            setPalette(ColorPalettes.XTERM_COLORS);
+        } else {
+            setPalette(ColorPalettes.XTERM_COLORS_DARK);
+        }
+        setLookAndFeel(true);
+    }
+
+    private void setPalette(Color[] palette) {
+        for (Terminal terminal : terminals) {
+            terminal.getSettingsProvider().setTerminalColorPalette(new ColorPaletteImpl(palette));
+        }
+    }
+
+    public void setCursorShape(CursorShape shape) {
+        for (Terminal terminal : terminals) {
+            terminal.getWidget().getTerminalPanel().setCursorShape(shape);
+        }
     }
 
 }

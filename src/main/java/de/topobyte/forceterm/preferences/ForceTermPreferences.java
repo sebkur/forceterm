@@ -7,8 +7,31 @@ import com.jediterm.terminal.CursorShape;
 
 public class ForceTermPreferences {
 
+    public static final String USE_CUSTOM_SHELL = "use-custom-shell";
+    public static final String CUSTOM_SHELL_COMMAND = "custom-shell-command";
+
     public static final String THEME = "theme";
     public static final String CURSOR_SHAPE = "cursor-shape";
+
+    public static boolean isUseCustomShell() {
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
+        return node.getBoolean(USE_CUSTOM_SHELL, false);
+    }
+
+    public static void setUseCustomShell(boolean useCustomShell) {
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
+        node.putBoolean(USE_CUSTOM_SHELL, useCustomShell);
+    }
+
+    public static String getCustomShellCommand() {
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
+        return node.get(CUSTOM_SHELL_COMMAND, null);
+    }
+
+    public static void setCustomShellCommand(String customShellCommand) {
+        Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);
+        node.put(CUSTOM_SHELL_COMMAND, customShellCommand);
+    }
 
     public static Theme getTheme() {
         Preferences node = Preferences.userNodeForPackage(ForceTermPreferences.class);

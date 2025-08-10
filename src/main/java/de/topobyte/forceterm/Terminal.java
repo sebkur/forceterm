@@ -19,4 +19,5 @@ public class Terminal {
     public ForceTermWidget getWidget() {
         return widget;
     }
+
 }

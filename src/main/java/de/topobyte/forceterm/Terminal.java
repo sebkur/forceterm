@@ -6,18 +6,18 @@ import de.topobyte.forceterm.preferences.Theme;
 public class Terminal {
 
     private final CustomSettingsProvider settingsProvider;
-    private final JediTermWidget widget;
+    private final ForceTermWidget widget;
 
     public Terminal(Theme theme) {
         settingsProvider = new CustomSettingsProvider(theme);
-        widget = new JediTermWidget(80, 24, settingsProvider);
+        widget = new ForceTermWidget(80, 24, settingsProvider);
     }
 
     public CustomSettingsProvider getSettingsProvider() {
         return settingsProvider;
     }
 
-    public JediTermWidget getWidget() {
+    public ForceTermWidget getWidget() {
         return widget;
     }
 }

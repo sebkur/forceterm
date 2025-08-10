@@ -1,9 +1,9 @@
 package de.topobyte.forceterm;
 
+import javax.swing.SwingUtilities;
+
 import de.topobyte.shared.preferences.SharedPreferences;
 import de.topobyte.swing.util.SwingUtils;
-
-import javax.swing.SwingUtilities;
 
 public class RunForceTerm {
 

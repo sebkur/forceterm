@@ -1,8 +1,9 @@
 package de.topobyte.forceterm;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.jediterm.core.Color;
 import com.jediterm.terminal.emulator.ColorPalette;
-import org.jetbrains.annotations.NotNull;
 
 public class ColorPaletteImpl extends ColorPalette {
 

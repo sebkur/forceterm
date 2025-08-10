@@ -1,5 +1,18 @@
 package de.topobyte.forceterm;
 
+import static com.jediterm.terminal.ui.UtilKt.isWindows;
+
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.KeyStroke;
+
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jediterm.terminal.DefaultTerminalCopyPasteHandler;
 import com.jediterm.terminal.TerminalCopyPasteHandler;
 import com.jediterm.terminal.model.StyleState;
@@ -8,17 +21,6 @@ import com.jediterm.terminal.ui.TerminalAction;
 import com.jediterm.terminal.ui.TerminalActionPresentation;
 import com.jediterm.terminal.ui.TerminalPanel;
 import com.jediterm.terminal.ui.settings.SettingsProvider;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.KeyStroke;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.jediterm.terminal.ui.UtilKt.isWindows;
 
 public class ForceTermTerminalPanel extends TerminalPanel {
 

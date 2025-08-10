@@ -38,6 +38,7 @@ spotless {
     java {
         eclipse('4.34').configFile("$project.rootDir/formatter.xml")
         removeUnusedImports()
+        importOrderFile('importorder.txt')
     }
 }
 

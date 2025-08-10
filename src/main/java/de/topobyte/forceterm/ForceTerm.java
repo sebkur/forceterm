@@ -1,31 +1,5 @@
 package de.topobyte.forceterm;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.jediterm.terminal.CursorShape;
-import com.jediterm.terminal.TtyConnector;
-import com.jediterm.terminal.ui.JediTermWidget;
-import com.pty4j.PtyProcess;
-import com.pty4j.PtyProcessBuilder;
-import de.topobyte.forceterm.preferences.ForceTermPreferences;
-import de.topobyte.forceterm.preferences.Theme;
-import de.topobyte.swing.util.JMenus;
-import de.topobyte.swing.util.action.SimpleAction;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -43,6 +17,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntConsumer;
+
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.jediterm.terminal.CursorShape;
+import com.jediterm.terminal.TtyConnector;
+import com.jediterm.terminal.ui.JediTermWidget;
+import com.pty4j.PtyProcess;
+import com.pty4j.PtyProcessBuilder;
+
+import de.topobyte.forceterm.preferences.ForceTermPreferences;
+import de.topobyte.forceterm.preferences.Theme;
+import de.topobyte.swing.util.JMenus;
+import de.topobyte.swing.util.action.SimpleAction;
 
 public class ForceTerm {
 

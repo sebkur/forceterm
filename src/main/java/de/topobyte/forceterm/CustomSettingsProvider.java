@@ -2,6 +2,7 @@ package de.topobyte.forceterm;
 
 import com.jediterm.terminal.emulator.ColorPalette;
 import com.jediterm.terminal.ui.settings.DefaultSettingsProvider;
+
 import de.topobyte.forceterm.preferences.Theme;
 
 public class CustomSettingsProvider extends DefaultSettingsProvider {

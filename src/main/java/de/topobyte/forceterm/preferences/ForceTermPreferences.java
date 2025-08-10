@@ -1,9 +1,9 @@
 package de.topobyte.forceterm.preferences;
 
-import com.jediterm.terminal.CursorShape;
-
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import com.jediterm.terminal.CursorShape;
 
 public class ForceTermPreferences {
 

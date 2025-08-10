@@ -1,14 +1,15 @@
 package de.topobyte.forceterm;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.jediterm.core.util.TermSize;
 import com.jediterm.terminal.ProcessTtyConnector;
 import com.pty4j.PtyProcess;
 import com.pty4j.WinSize;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.nio.charset.Charset;
-import java.util.List;
 
 /**
  * @author traff

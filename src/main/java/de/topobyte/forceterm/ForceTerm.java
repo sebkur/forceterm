@@ -1,12 +1,17 @@
 package de.topobyte.forceterm;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +31,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -38,6 +46,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.jediterm.core.Color;
 import com.jediterm.terminal.CursorShape;
+import com.jediterm.terminal.ProcessTtyConnector;
 import com.jediterm.terminal.TtyConnector;
 import com.jediterm.terminal.ui.JediTermWidget;
 import com.pty4j.PtyProcess;
@@ -73,7 +82,7 @@ public class ForceTerm {
 
             if (ForceTermPreferences.isUseCustomShell()) {
                 String customShellCommand = ForceTermPreferences.getCustomShellCommand();
-                if (customShellCommand != null) {
+                if (customShellCommand != null && !customShellCommand.isBlank()) {
                     command = customShellCommand.split(" ");
                 }
             }
@@ -330,22 +339,72 @@ public class ForceTerm {
     }
 
     private void addTerminalWidget(boolean focus) {
-        Terminal terminal = createTerminalWidget();
-        terminals.add(terminal);
-
-        JediTermWidget widget = terminal.getWidget();
-        widget.getTerminal().addApplicationTitleListener(title -> {
-            int index = tabbed.indexOfComponent(widget);
-            tabbed.setTitleAt(index, title);
-        });
-        tabbed.addTab("Terminal", widget);
-        widget.addListener(terminalWidget -> closeTab(widget));
-
-        if (focus) {
-            SwingUtilities.invokeLater(() -> {
-                tabbed.setSelectedComponent(widget);
-                widget.getTerminalPanel().requestFocus();
+        try {
+            Terminal terminal = createTerminalWidget();
+            terminals.add(terminal);
+            JediTermWidget widget = terminal.getWidget();
+            widget.getTerminal().addApplicationTitleListener(title -> {
+                int index = tabbed.indexOfComponent(widget);
+                tabbed.setTitleAt(index, title);
             });
+            tabbed.addTab("Terminal", widget);
+            widget.addListener(terminalWidget -> {
+                ProcessTtyConnector ttyConnector = (ProcessTtyConnector) widget.getTtyConnector();
+                // Only close the tab if the shell process exited gracefully.
+                // This catches the case where the user supplied a non-working
+                // command as a custom shell command
+                int exitValue = ttyConnector.getProcess().exitValue();
+                if (exitValue == 0) {
+                    closeTab(widget);
+                }
+            });
+            if (focus) {
+                SwingUtilities.invokeLater(() -> {
+                    tabbed.setSelectedComponent(widget);
+                    widget.getTerminalPanel().requestFocus();
+                });
+            }
+        } catch (IllegalStateException e) {
+            displayError(e);
+            return;
+        }
+    }
+
+    private void displayError(Throwable e) {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JTextArea textArea = new JTextArea();
+        textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        textArea.setEditable(false);
+        textArea.setLineWrap(false);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter pw = new PrintWriter(stringWriter);
+        printThrowable(e, pw, "");
+        pw.close();
+
+        textArea.setText(stringWriter.toString());
+
+        JScrollPane jsp = new JScrollPane(textArea);
+        jsp.setPreferredSize(new Dimension(600, 500));
+        panel.add(jsp);
+
+        tabbed.add("Error", panel);
+
+        SwingUtilities.invokeLater(() -> textArea.setCaretPosition(0));
+    }
+
+    private static void printThrowable(Throwable t, PrintWriter pw, String caption) {
+        pw.println(caption + t);
+        for (StackTraceElement ste : t.getStackTrace()) {
+            pw.println("\tat " + ste);
+        }
+        for (Throwable sup : t.getSuppressed()) {
+            printThrowable(sup, pw, "Suppressed: ");
+        }
+        Throwable cause = t.getCause();
+        if (cause != null) {
+            printThrowable(cause, pw, "Caused by: ");
         }
     }
 

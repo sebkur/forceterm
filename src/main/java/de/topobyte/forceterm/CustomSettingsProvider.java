@@ -25,4 +25,8 @@ public class CustomSettingsProvider extends DefaultSettingsProvider {
         }
     }
 
+    @Override
+    public boolean emulateX11CopyPaste() {
+        return PlatformUtil.getOS() == OperatingSystem.LINUX;
+    }
 }

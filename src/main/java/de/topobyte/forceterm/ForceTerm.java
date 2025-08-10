@@ -44,9 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
-import static de.topobyte.forceterm.PlatformUtil.isMacOS;
-import static de.topobyte.forceterm.PlatformUtil.isWindows;
-
 public class ForceTerm {
 
     private Theme theme;
@@ -67,7 +64,8 @@ public class ForceTerm {
             Map<String, String> envs = System.getenv();
             String[] command;
             boolean setDirToHome = false;
-            if (isWindows()) {
+            OperatingSystem os = PlatformUtil.getOS();
+            if (os == OperatingSystem.WINDOWS) {
                 Path bash = Paths.get("C:\\Program Files\\Git\\bin\\bash.exe");
                 if (Files.exists(bash)) {
                     command = new String[]{bash.toString()};
@@ -77,7 +75,7 @@ public class ForceTerm {
                 // We currently don't have a reliable way to determine if this was launched from the start menu
                 // or from any kind of shell (powershell, cmd, git bash etc). So for now, always set the dir to home.
                 setDirToHome = true;
-            } else if (isMacOS()) {
+            } else if (os == OperatingSystem.MACOS) {
                 command = new String[]{"/bin/zsh", "--login"};
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
@@ -85,13 +83,15 @@ public class ForceTerm {
                 envs.put("LC_ALL", "en_US.UTF-8");
 
                 setDirToHome = System.getenv().get("TERM") == null;
-            } else {
+            } else if (os == OperatingSystem.LINUX) {
                 command = new String[]{"/bin/bash", "--login"};
                 envs = new HashMap<>(System.getenv());
                 envs.put("TERM", "xterm-256color");
                 // Workaround to make it possible to launch other apps built using jpackage
                 // from the shell.
                 envs.remove("_JPACKAGE_LAUNCHER");
+            } else {
+                throw new RuntimeException("Invalid Operating System");
             }
 
             PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command);

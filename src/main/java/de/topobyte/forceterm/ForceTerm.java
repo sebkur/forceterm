@@ -41,6 +41,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -59,6 +61,8 @@ import de.topobyte.swing.util.JMenus;
 import de.topobyte.swing.util.action.SimpleAction;
 
 public class ForceTerm {
+
+    final static Logger logger = LoggerFactory.getLogger(ForceTerm.class);
 
     private Theme theme;
 
@@ -348,13 +352,40 @@ public class ForceTerm {
                 tabbed.setTitleAt(index, title);
             });
             tabbed.addTab("Terminal", widget);
+            long tsStart = System.currentTimeMillis();
             widget.addListener(terminalWidget -> {
                 ProcessTtyConnector ttyConnector = (ProcessTtyConnector) widget.getTtyConnector();
-                // Only close the tab if the shell process exited gracefully.
-                // This catches the case where the user supplied a non-working
-                // command as a custom shell command
-                int exitValue = ttyConnector.getProcess().exitValue();
-                if (exitValue == 0) {
+                int exitCode = -1;
+                try {
+                    exitCode = ttyConnector.getProcess().exitValue();
+                } catch (IllegalThreadStateException e) {
+                    logger.warn("Pty process has not exited yet");
+                }
+                long tsEnd = System.currentTimeMillis();
+                long duration = tsEnd - tsStart;
+                logger.info("Pty exited with code '{}' after {} ms runtime", exitCode, duration);
+                // It is difficult to determine erroneous situations here. There
+                // are different reasons why and how the shell startup could
+                // fail. If the user defined a custom command that doesn't exist
+                // at all such as `foobar`, we will catch the exception below
+                // and can display an error.
+                //
+                // However, if the user specified a valid command such as `ls`
+                // the shell will execute quickly with a zero exit code. We want
+                // to give the user the ability to reconfigure the shell command
+                // using the UI in such a case.
+                //
+                // If the user specifies a valid command but invalid options
+                // such as `bash foobar`, then the process will exit with
+                // non-zero exit code. We cannot rely on the non-zero exit code
+                // alone though, because there are also various situations in
+                // which bash (and probably other shells too) return non-zero
+                // exit codes even though the session ended just fine (probably
+                // because they return the last command's exit code).
+                //
+                // We use a very simple heuristic now, just expect a session to
+                // not be absurdly short and keep the tab open if it was.
+                if (duration > 200) {
                     closeTab(widget);
                 }
             });

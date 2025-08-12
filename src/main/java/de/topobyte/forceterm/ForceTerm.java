@@ -409,8 +409,13 @@ public class ForceTerm {
     }
 
     private void closeCurrentTab() {
-        JediTermWidget widget = (JediTermWidget) tabbed.getSelectedComponent();
-        closeTab(widget);
+        Component component = tabbed.getSelectedComponent();
+        if (component instanceof JediTermWidget) {
+            JediTermWidget widget = (JediTermWidget) component;
+            closeTab(widget);
+        } else {
+            SwingUtilities.invokeLater(() -> tabbed.remove(component));
+        }
     }
 
     private void closeTab(JediTermWidget widget) {

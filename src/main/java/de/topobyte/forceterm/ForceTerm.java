@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,9 @@ import com.jediterm.terminal.ui.JediTermWidget;
 import com.pty4j.PtyProcess;
 import com.pty4j.PtyProcessBuilder;
 
+import de.topobyte.forceterm.init.InitAtDir;
+import de.topobyte.forceterm.init.InitAuto;
+import de.topobyte.forceterm.init.InitMode;
 import de.topobyte.forceterm.preferences.ForceTermPreferences;
 import de.topobyte.forceterm.preferences.Theme;
 import de.topobyte.forceterm.settings.ConfigurationAction;
@@ -66,18 +70,18 @@ public class ForceTerm {
 
     private Theme theme;
 
-    private Terminal createTerminalWidget() {
+    private Terminal createTerminalWidget(InitMode init) {
         Terminal terminal = new Terminal(theme);
         JediTermWidget widget = terminal.getWidget();
 
         widget.getTerminalPanel().setDefaultCursorShape(ForceTermPreferences.getCursorShape());
-        widget.setTtyConnector(createTtyConnector());
+        widget.setTtyConnector(createTtyConnector(init));
         widget.start();
 
         return terminal;
     }
 
-    private static @NotNull TtyConnector createTtyConnector() {
+    private static @NotNull TtyConnector createTtyConnector(InitMode init) {
         try {
             Map<String, String> envs = System.getenv();
             String[] command = null;
@@ -130,10 +134,15 @@ public class ForceTerm {
             }
 
             PtyProcessBuilder ptyProcessBuilder = new PtyProcessBuilder().setCommand(command);
-            if (setDirToHome) {
-                ptyProcessBuilder.setDirectory(System.getProperty("user.home"));
-            } else {
-                ptyProcessBuilder.setDirectory("");
+            if (init instanceof InitAuto) {
+                if (setDirToHome) {
+                    ptyProcessBuilder.setDirectory(System.getProperty("user.home"));
+                } else {
+                    ptyProcessBuilder.setDirectory("");
+                }
+            } else if (init instanceof InitAtDir) {
+                InitAtDir atDir = (InitAtDir) init;
+                ptyProcessBuilder.setDirectory(atDir.getDirectory());
             }
             ptyProcessBuilder.setEnvironment(envs);
             PtyProcess process = ptyProcessBuilder.start();
@@ -147,7 +156,11 @@ public class ForceTerm {
     private JTabbedPane tabbed;
     private final List<Terminal> terminals = new ArrayList<>();
 
-    public void createAndShowGUI() {
+    public void createAndShowGUI(InitMode init) {
+        createAndShowGUI(Arrays.asList(init));
+    }
+
+    public void createAndShowGUI(List<InitMode> inits) {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
         theme = ForceTermPreferences.getTheme();
@@ -178,7 +191,9 @@ public class ForceTerm {
             }
         });
 
-        addTerminalWidget(true);
+        for (InitMode init : inits) {
+            addTerminalWidget(init, true);
+        }
 
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -238,7 +253,7 @@ public class ForceTerm {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                addTerminalWidget(true);
+                addTerminalWidget(new InitAuto(), true);
             }
 
         };
@@ -342,9 +357,9 @@ public class ForceTerm {
         actionMap.put(mapKey, action);
     }
 
-    private void addTerminalWidget(boolean focus) {
+    private void addTerminalWidget(InitMode init, boolean focus) {
         try {
-            Terminal terminal = createTerminalWidget();
+            Terminal terminal = createTerminalWidget(init);
             terminals.add(terminal);
             JediTermWidget widget = terminal.getWidget();
             widget.getTerminal().addApplicationTitleListener(title -> {

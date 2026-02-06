@@ -2,7 +2,7 @@ pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
-        maven { url 'https://mvn.topobyte.de' }
+        maven { url = 'https://mvn.topobyte.de' }
     }
     plugins {
         def kotlinVersion = getProperty("kotlin.version")
